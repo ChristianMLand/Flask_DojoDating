@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        .active{
+            color: black !important
+        }
+        /* *{
+            outline: 2px solid purple;
+        } */
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light border mb-3">
+        <span class="navbar-brand mr-auto">Welcome {{logged_user.username}}</span>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link text-muted" href="/discover">Discover</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/mutuals">Mutuals</a></li>
+            <li class="nav-item"><a class="nav-link text-muted active" href="/profile">Profile</a></li>
+        </ul>
+        <a class="nav-link text-danger" href="/users/logout">Logout</a>
+    </nav>
+    <div class="container text-center" style="width: 45rem">
+        <form action="/profile/update" method="POST" enctype="multipart/form-data">
+            <div class="d-flex align-items-end mb-3">
+                <img class="mr-3" style="width:15rem" alt="avatar" src="{{url_for('static',filename='img/')}}{{logged_user.avatar}}">
+                <div class="col">
+                    <h1 class="row">{{logged_user.username}}</h1>
+                    <div class="row">
+                        <h4 class="text-muted mr-3">Age: {{logged_user.age}}</h4>
+                        <h4 class="text-muted">Gender:</h4>
+                        <select class="form-control col-4 ml-2" name="gender">
+                            <option value="{{logged_user.gender}}" selected>{{logged_user.gender|capitalize}}</option>
+                            {% for gen in ['male','female','nonbinary','other'] %}
+                            {% if gen != logged_user.gender %}
+                            <option value="{{gen}}">{{gen|capitalize}}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <input class="form-control-file mb-3" type="file" name="avatar" accept="image/*">
+            <textarea rows="1" name="description" class="form-control mb-3">{{logged_user.description if logged_user.description else ""}}</textarea>
+            <button class="btn btn-lg btn-outline-success">Save</button>
+        </form>
+    </div>
+</body>
+</html>

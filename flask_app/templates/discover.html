@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        .active{
+            color: black !important
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light border mb-3">
+        <span class="navbar-brand mr-auto">Welcome {{logged_user.username}}</span>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link text-muted active" href="/discover">Discover</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/mutuals">Mutuals</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/profile">Profile</a></li>
+        </ul>
+        <a class="nav-link text-danger" href="/users/logout">Logout</a>
+    </nav>
+    <div class="container text-center">
+        {% if rand_user %}
+        <div class="card mx-auto text-left" style="width:25rem">
+            <img src="{{url_for('static',filename='img/')}}{{rand_user.avatar}}" alt="avatar" class="card-img-top">
+            <div class="card-body">
+                <h1 class="card-title"><a href="/profile/{{rand_user.id}}" class="card-link">{{rand_user.username}}</a></h1>
+                <h3 class="card-subtitle mb-2 text-muted">Age: {{rand_user.age}}</h3>
+            </div>
+            <div class="card-footer d-flex flex-wrap justify-content-between">
+                <a href="/like-user/{{rand_user.id}}" class="btn col-4 btn-lg btn-outline-success">Like</a>
+                <a href="/pass-user/{{rand_user.id}}" class="btn col-4 btn-lg btn-outline-danger">Pass</a>
+            </div>
+        </div>
+        {% else %}
+        <h1 class="text-muted">Sorry we couldn't find anyone else!</h1>
+        <a class="btn btn-lg btn-outline-danger" href="/reset-passes">RESET PASSES</a>
+        <!-- <a class="btn btn-lg btn-outline-danger" href="/reset-likes">RESET LIKES</a> -->
+        {% endif %}
+    </div>
+</body>
+</html>

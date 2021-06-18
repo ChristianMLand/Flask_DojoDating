@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Registration</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <div class="row justify-content-center">
+        <form class="col-4" action="/users/register" method="POST">
+            <fieldset class="border p-3">
+                <legend class="w-auto">Register</legend>
+                <input placeholder="Username" class="form-control mb-2" type="text" name="username">
+                {% for error in get_flashed_messages(category_filter=["User.username"]) %}
+                    <p class="alert alert-danger">{{error}}</p>
+                {% endfor %}
+                <div class="row">
+                    <div class="col">
+                        <input class="form-control mb-2" onfocus="this.type='date'" type="text" placeholder="Birthday" name="birthday">
+                    </div>
+                    <div class="col">
+                        <select class="form-control mb-2" name="gender">
+                            <option value="none" selected hidden>Please select a gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="nonbinary">Non-Binary</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                {% for error in get_flashed_messages(category_filter=["User.birthday"]) %}
+                    <p class="alert alert-danger">{{error}}</p>
+                {% endfor %}
+                {% for error in get_flashed_messages(category_filter=["User.gender"]) %}
+                    <p class="alert alert-danger">{{error}}</p>
+                {% endfor %}
+                <input placeholder="Email" class="form-control mb-2" type="email" name="email">
+                {% for error in get_flashed_messages(category_filter=["User.email"]) %}
+                    <p class="alert alert-danger">{{error}}</p>
+                {% endfor %}
+                <input placeholder="Password" class="form-control mb-2" type="password" name="password">
+                {% for error in get_flashed_messages(category_filter=["User.password"]) %}
+                    <p class="alert alert-danger">{{error}}</p>
+                {% endfor %}
+                <input placeholder="Confirm Password" class="form-control mb-2" type="password" name="confirm_password">
+                {% for error in get_flashed_messages(category_filter=["User.confirm_password"]) %}
+                    <p class="alert alert-danger">{{error}}</p>
+                {% endfor %}
+                <button class="btn btn-secondary">Register</button>
+            </fieldset>
+        </form>
+        <form class="col-4" action="/users/login" method="POST">
+            <fieldset class="border p-3">
+                <legend class="w-auto">Login</legend>
+                <input placeholder="Email" class="form-control mb-2" type="email" name="login_email">
+                {% for error in get_flashed_messages(category_filter=["User.login_email"]) %}
+                    <p class="alert alert-danger">{{error}}</p>
+                {% endfor %}
+                <input placeholder="Password" class="form-control mb-2" type="password" name="login_password">
+                {% for error in get_flashed_messages(category_filter=["User.login_password"]) %}
+                    <p class="alert alert-danger">{{error}}</p>
+                {% endfor %}
+                <button class="btn btn-secondary">Login</button>
+            </fieldset>
+        </form>
+    </div>
+</body>
+</html>

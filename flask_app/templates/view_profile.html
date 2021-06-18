@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        .active{
+            color: black !important
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light border mb-3">
+        <span class="navbar-brand mr-auto">Welcome {{logged_user.username}}</span>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link text-muted" href="/discover">Discover</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/mutuals">Mutuals</a></li>
+            <li class="nav-item"><a class="nav-link text-muted active" href="/profile">Profile</a></li>
+        </ul>
+        <a class="nav-link text-danger" href="/users/logout">Logout</a>
+    </nav>
+    <div class="container text-center" style="width: 45rem">
+        <div class="text-left d-flex align-items-end mb-3">
+            <img class="mr-3" style="width:15rem" alt="avatar" src="{{url_for('static',filename='img/')}}{{profile_user.avatar}}">
+            <div class="col">
+                <h1 class="row">{{profile_user.username}}</h1>
+                <div class="row">
+                    <h4 class="text-muted mr-3">Age: {{profile_user.age}}</h4>
+                    <h4 class="text-muted">Gender: {{profile_user.gender}}</h4>
+                </div>
+            </div>
+        </div>
+        <p class="border p-3 text-left">{{profile_user.description if profile_user.description else "No description"}}</p>
+        {% if profile_user == logged_user %}
+        <a class="btn btn-lg btn-outline-secondary" href="/profile/edit">Edit</a>
+        {% elif profile_user in logged_user.likes %}
+        <a class="btn btn-lg btn-outline-danger" href="/unlike-user/{{profile_user.id}}">Un-Like</a>
+        {% else %}
+        <a class="btn btn-lg btn-outline-success" href="/like-user/{{profile_user.id}}">Like</a>
+        {% endif %}
+    </div>
+</body>
+</html>
