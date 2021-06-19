@@ -53,7 +53,7 @@ class QuerySet:
     def _count(self,attr):
         col = getattr(self._model(),attr)
         if isinstance(col,MtM):
-            return f"LEFT JOIN `{col.middle}` ON `{col.right_name}_id`=`{col.right.table}`.id GROUP BY `{col.right.table}`.id ORDER BY COUNT(`{col.right.table}`.id) "
+            return f"LEFT JOIN `{col.middle}` ON `{col.left_name}_id`=`{col.left.table}`.id GROUP BY `{col.left.table}`.id ORDER BY COUNT(`{col.left.table}`.id) "
         elif isinstance(col,QuerySet):
             col_name = None
             for k in col._data:
