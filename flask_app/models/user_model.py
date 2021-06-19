@@ -47,10 +47,6 @@ def birthday(val):
     if val:
         return User.get_age(datetime.strptime(val,"%Y-%m-%d")) >= 18
 
-@User.validator("Avatar must be an image!")
-def avatar(val):#TODO
-    return True
-
 @User.validator("Must be a valid email!")
 def email(val):
     return re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$').match(val)
@@ -75,4 +71,8 @@ def login_email(val):
 def login_password(val,email):
     user = User.retrieve(email=email).first()
     return user and bcrypt.check_password_hash(user.password,val)
+
+# @User.validator("Avatar must be an image!")
+# def avatar(val):#TODO
+#     return True
 #----------------------------------------------------------------#
