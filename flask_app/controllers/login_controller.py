@@ -5,13 +5,18 @@ from flask_app import app,bcrypt
 #----------------Display-----------------#
 @app.get('/')
 def index():
+    if 'id' in session:
+        return redirect('/discover')
     return render_template('index.html')
 #----------------Action------------------#
 @app.post('/users/register')
 def register_user():
     if User.validate(**request.form):
         session['id'] = User.create(
-            **request.form,
+            username = request.form['username'],
+            birthday = request.form['birthday'],
+            gender = request.form['gender'],
+            email = request.form['email'],
             password=bcrypt.generate_password_hash(request.form['password'])
         )
         return redirect('/discover')

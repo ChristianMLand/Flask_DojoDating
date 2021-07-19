@@ -1,31 +1,53 @@
-from flask import flash
+from datetime import datetime
+from flask import flash,session,redirect
 from flask_app import DB
-import math,pymysql.cursors
+import pymysql.cursors
+from functools import wraps
+
+def convertToBinaryData(filename):
+    with open(filename, 'rb') as file:
+        binaryData = file.read()
+    return binaryData
 
 class QuerySet:
     def __init__(self,model,query,data=None):
         self._model = model
         self._query = query
         self._data = data
-        self._collection = None
         self._config = {}
+        self._collection = None
 
-    def order_by(self,**config):
+    def order_by(self,column='id',**config):
+        self._config['column'] = column
         self._config['rand'] = config.get('rand')
-        self._config['column'] = config.get('column','id')
         self._config['desc'] = config.get('desc')
         self._config['count'] = config.get('count')
+        return self
+
+    def group_by(self,column):
+        self._config['group_by'] = column
         return self
 
     def exclude(self,*args):
         total = args[0]
         for arg in args:
-            total += arg
+            if isinstance(arg,Model):
+                total += QuerySet(arg.__class__,f"SELECT `id` FROM `{arg.table}` WHERE `id`={arg.id}")
+            else:
+                total += arg
         self._config['exclude'] = total._query
         return self
 
     def intersect(self,other):
         self._config['intersect'] = other
+        return self
+
+    def limit(self,lim):
+        self._config['limit'] = lim
+        return self
+
+    def skip(self,sk):
+        self._config['skip'] = sk
         return self
 
     def first(self):
@@ -80,6 +102,9 @@ class QuerySet:
                     q_split = intersect.split('.*')
                     formatted = " `id`".join([s.rsplit(' ',1)[:-1][0] for s in q_split[:-1]]+[q_split[-1]])
                     config += f"{'WHERE ' if 'WHERE' not in self._query else 'AND '}`id` IN ({formatted}) "
+                #GROUP BY
+                if group_by := self._config.get('group_by'):
+                    config += f"GROUP BY `{group_by}` "
                 #ORDER BY
                 config += "ORDER BY "
                 if self._config.get('rand'):
@@ -91,7 +116,10 @@ class QuerySet:
                 config += "DESC "
             #LIMIT
             if limit := self._config.get('limit'):
-                config += f"LIMIT {limit}"
+                config += f"LIMIT {limit} "
+            #SKIP/OFFSET
+            if skip := self._config.get('skip'):
+                config += f"OFFSET {skip} "
         query = f"{self._query} {config}"
         results = [self._model(**item) for item in connectToMySQL(DB).query_db(query)]
         self._config = {}
@@ -132,7 +160,7 @@ class QuerySet:
     def __getitem__(self,key):
         if type(key) is not int:
             raise TypeError("index must be of type int!")
-        if type(key) is int and (key < 0 and math.abs(key)-1 < len(self)) or key < len(self):
+        if type(key) is int and (key < 0 and abs(key)-1 < len(self)) or key < len(self):
             return self._collection[key]
 
     def __setitem__(self,*args):
@@ -288,3 +316,11 @@ def table(table):
         return inner
     setattr(table,"table",table.__name__.lower()+"s")
     return table
+
+def login_required(view):
+    @wraps(view)
+    def inner(*args, **kwargs):
+        if 'id' not in session:
+            return redirect('/')
+        return view(*args, **kwargs)
+    return inner

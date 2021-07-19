@@ -6,7 +6,7 @@ from datetime import date,datetime
 @table
 class User(Model):
     def __init__(self, **data):
-#----------------attributes--------------------#
+#---------------------------attributes--------------------------#
         self.id = data.get('id')
         self.username = data.get('username')
         self.birthday = data.get('birthday')
@@ -17,13 +17,14 @@ class User(Model):
         self.password = data.get('password')
         self.created_at = data.get('created_at')
         self.updated_at = data.get('updated_at')
-#---------------relationships-------------------#
+#---------------------------relationships-----------------------#
         self.likes = MtM("likes",liker=self,liked=User)
         self.liked_by = MtM("likes",liked=self,liker=User)
         self.passes = MtM("passes",passer=self,passed=User)
-        self.mutuals = self.likes.intersect(self.liked_by._query)
+        self.matches = (Match.retrieve(matcher_id=self.id) + Match.retrieve(matched_id=self.id)).order_by(desc=True)
         self.seen_users = self.likes + self.passes
-#-----------------------------------------------#
+        self.messages = DirectMessage.retrieve(user_id=self.id)
+#---------------------------------------------------------------#
     @property
     def age(self):
         return User.get_age(self.birthday)
@@ -33,7 +34,7 @@ class User(Model):
         today = date.today()
         return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
-#----------------------Validations-----------------------------#
+#------------------------Validations-----------------------------#
 @User.validator("Username name must be at least 5 characters!")
 def username(val):
     return len(val) >= 2
@@ -71,8 +72,6 @@ def login_email(val):
 def login_password(val,email):
     user = User.retrieve(email=email).first()
     return user and bcrypt.check_password_hash(user.password,val)
-
-# @User.validator("Avatar must be an image!")
-# def avatar(val):#TODO
-#     return True
 #----------------------------------------------------------------#
+from .direct_message_model import DirectMessage
+from .match_model import Match

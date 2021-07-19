@@ -5,19 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discover</title>
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js" integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <style>
-        .active{
-            color: black !important
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <nav class="navbar navbar-light bg-light border mb-3">
         <span class="navbar-brand mr-auto">Welcome {{logged_user.username}}</span>
         <ul class="nav">
             <li class="nav-item"><a class="nav-link text-muted active" href="/discover">Discover</a></li>
-            <li class="nav-item"><a class="nav-link text-muted" href="/mutuals">Mutuals</a></li>
+            <li class="nav-item"><a class="nav-link text-muted" href="/matches">Matches</a></li>
             <li class="nav-item"><a class="nav-link text-muted" href="/profile">Profile</a></li>
         </ul>
         <a class="nav-link text-danger" href="/users/logout">Logout</a>
@@ -36,10 +33,11 @@
             </div>
         </div>
         {% else %}
-        <h1 class="text-muted">Sorry we couldn't find anyone else!</h1>
+        <h1 class="alert alert-secondary text-center">Sorry we couldn't find anyone else!</h1>
         <a class="btn btn-lg btn-outline-danger" href="/reset-passes">RESET PASSES</a>
         <!-- <a class="btn btn-lg btn-outline-danger" href="/reset-likes">RESET LIKES</a> -->
         {% endif %}
     </div>
+    <script src="{{ url_for('static', filename='js/newMatch.js') }}"></script>
 </body>
 </html>
