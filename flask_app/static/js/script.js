@@ -1,7 +1,7 @@
 const socket = io.connect('http://127.0.0.1:5000');
 const messages = document.getElementById('messages');
 const form = document.querySelector('form');
-const load_messages = document.getElementById('loadMessages');
+const loadMessages = document.getElementById('loadMessages');
 const msgInput = document.getElementById('msgInput');
 const sendBtn = document.getElementById('sendBtn');
 //-------------------------Listeners--------------------//
@@ -85,11 +85,11 @@ function setupSendMessage(){
 }
 
 function setupLoadMessages(page=0){
-    load_messages.onclick = e => {
+    loadMessages.onclick = e => {
         e.preventDefault();
         handleLoadMessages(page++);
     }
-    load_messages.click()
+    loadMessages.click()
 }
 
 function setupEditMessage(msg_id){

@@ -13,18 +13,22 @@ from flask_app.config.orm2 import login_required
 def chat(match_id):
     logged_user = User.retrieve(id=session['id']).first()
     match = Match.retrieve(id=match_id).first()
-    if not match or match and match not in logged_user.matches:
+    if not match or match and match not in logged_user.matches:#make sure the user has access to this chat
         return redirect('/matches')
+    if match.matched.first() == logged_user:#depending on who was the last to like, logged_user could be matched or matcher
+        other_user = match.matcher.first()
+    else:
+        other_user = match.matched.first()
     context = {
         'logged_user' : logged_user,
         'match' : match,
-        'matched' : match.matched.first() if match.matched.first() != logged_user else match.matcher.first(),
+        'matched' : other_user
     }
     return render_template('chat.html', **context)
 #----------------Listeners------------------#
 @socketio.on('join_room')
 def handle_join_room(data):
-    join_room(f"{data['match_id']}")
+    join_room(f"{data['match_id']}")#join room based on match_id which is guaranteed unique
     emit('join_room',data,broadcast=True)
 
 @socketio.on('send_message')
@@ -34,7 +38,7 @@ def handle_send_message(data):
         sender_id = data['sender_id'],
         content = data['content']
     )
-    msg = DirectMessage.retrieve(id=msg_id).first()
+    msg = DirectMessage.retrieve(id=msg_id).first()#retrieve newly created message to get timestamps
     msg_data = {
         "id" : msg.id,
         "sender_username" : data['sender_username'],
@@ -52,7 +56,7 @@ def handle_update_message(data):
         content=data['content'],
         is_deleted=data['is_deleted']
     )
-    msg = DirectMessage.retrieve(id=data['id']).first()
+    msg = DirectMessage.retrieve(id=data['id']).first()#retrieve updated message to get timestamps
     msg_data = {
         "id" : msg.id,
         "sender_username" : data['sender_username'],
@@ -66,7 +70,7 @@ def handle_update_message(data):
 
 @socketio.on('load_messages')
 def handle_load_messages(data):
-    messages = (
+    messages = (#retrieve next batch of messages from the db
         DirectMessage
         .retrieve(match_id=data['match_id'])
         .order_by(desc=True)
@@ -74,7 +78,7 @@ def handle_load_messages(data):
         .skip((data['page'])*MESSAGE_COUNT)
     )
     json_msgs = []
-    for msg in messages:
+    for msg in messages:#convert messages to json data
         json_msgs.append(
             {
                 "id" : msg.id,
