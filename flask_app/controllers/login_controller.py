@@ -12,13 +12,11 @@ def index():
 @app.post('/users/register')
 def register_user():
     if User.validate(**request.form):
-        session['id'] = User.create(
-            username = request.form['username'],
-            birthday = request.form['birthday'],
-            gender = request.form['gender'],
-            email = request.form['email'],
-            password=bcrypt.generate_password_hash(request.form['password'])
-        )
+        data = {
+            **request.form,
+            "password":bcrypt.generate_password_hash(request.form['password'])
+        }
+        session['id'] = User.create(**data)
         return redirect('/discover')
     return redirect('/')
 

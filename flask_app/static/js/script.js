@@ -1,4 +1,9 @@
 const socket = io.connect('http://127.0.0.1:5000');
+const messages = document.getElementById('messages');
+const form = document.querySelector('form');
+const load_messages = document.getElementById('loadMessages');
+const msgInput = document.getElementById('msgInput');
+const sendBtn = document.getElementById('sendBtn');
 //-------------------------Listeners--------------------//
 socket.on('connect', () => {
     socket.emit('join_room', {
