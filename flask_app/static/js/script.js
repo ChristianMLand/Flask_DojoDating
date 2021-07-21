@@ -28,7 +28,7 @@ socket.on('update_message', data => {
     messages.replaceChild(createMessageComponent(data),myMsg)
 });
 
-socket.on('load_messages', data => {//TODO cleanup
+socket.on('load_messages', data => {
     for(let msg of data.messages){
         messages.appendChild(createMessageComponent(msg));
     }
@@ -104,7 +104,7 @@ function setupEditMessage(msg_id){
 //---------------Utility----------------------//
 function createMessageComponent(msg){
     const li = document.createElement('li');
-    li.setAttribute('data-sender_id',msg.sender_id);//TODO make data attributes
+    li.setAttribute('data-sender_id',msg.sender_id);
     li.setAttribute('data-message_id', msg.id);
     li.classList.add('d-flex','align-items-center','list-group-item','list-group-item-action');
 
