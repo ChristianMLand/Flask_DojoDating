@@ -1,5 +1,5 @@
 from flask_app import bcrypt
-from flask_app.config.orm2 import Model,MtM,table
+from flask_app.config.orm2 import Model,MtM,table,validator
 import re
 from datetime import date,datetime
 
@@ -35,43 +35,43 @@ class User(Model):
         return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 #------------------------Validations-----------------------------#
-@User.validator("Username name must be at least 5 characters!")
-def username(val):
-    return len(val) >= 2
+    @validator("Username name must be at least 5 characters!")
+    def username(val):
+        return len(val) >= 2
 
-@User.validator("Must select a gender!")
-def gender(val):
-    return val in ['male','female','nonbinary','other']
+    @validator("Must select a gender!")
+    def gender(val):
+        return val in ['male','female','nonbinary','other']
 
-@User.validator("You must be at least 18 years old!")
-def birthday(val):
-    if val:
-        return User.get_age(datetime.strptime(val,"%Y-%m-%d")) >= 18
+    @validator("You must be at least 18 years old!")
+    def birthday(val):
+        if val:
+            return User.get_age(datetime.strptime(val,"%Y-%m-%d")) >= 18
 
-@User.validator("Must be a valid email!")
-def email(val):
-    return re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$').match(val)
+    @validator("Must be a valid email!")
+    def email(val):
+        return re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$').match(val)
 
-@User.validator("Email is already in use!")
-def email(val):
-    return not bool(User.retrieve(email=val).first())
+    @validator("Email is already in use!")
+    def email(val):
+        return not bool(User.retrieve(email=val).first())
 
-@User.validator("Password must be at least 8 characters!")
-def password(val):
-    return len(val) >= 8
+    @validator("Password must be at least 8 characters!")
+    def password(val):
+        return len(val) >= 8
 
-@User.validator("Passwords must match!",match="password")
-def confirm_password(val,match):
-    return val == match
+    @validator("Passwords must match!",match="password")
+    def confirm_password(val,match):
+        return val == match
 
-@User.validator("Invalid Email!")
-def login_email(val):
-    return bool(User.retrieve(email=val).first())
+    @validator("Invalid Email!")
+    def login_email(val):
+        return bool(User.retrieve(email=val).first())
 
-@User.validator("Invalid Password!",email="login_email")
-def login_password(val,email):
-    user = User.retrieve(email=email).first()
-    return user and bcrypt.check_password_hash(user.password,val)
+    @validator("Invalid Password!",email="login_email")
+    def login_password(val,email):
+        user = User.retrieve(email=email).first()
+        return user and bcrypt.check_password_hash(user.password,val)
 #----------------------------------------------------------------#
 from .direct_message_model import DirectMessage
 from .match_model import Match

@@ -277,22 +277,13 @@ class Model:
     def validate(cls, **data):
         is_valid = True
         for field,val in data.items():
-            for valid,msg,kwargs in cls.validators.get(field,[]):
-                kwargs = {k:data.get(v) for k,v in kwargs.items()}
-                if not valid(val,**kwargs):
-                    flash(msg,f"{cls.__name__}.{field}")
+            for v in Validation.all_validations[cls.__name__].get(field,[]):
+                kwargs = {k:data.get(v) for k,v in v.kwargs.items()}
+                if not v(val,**kwargs):
+                    flash(v.msg,v.func.__qualname__)
                     is_valid = False
-                    # break#limits to one validation per field at a time
         return is_valid
-
-    @classmethod
-    def validator(cls,msg,**kwargs):
-        def register(func):
-            cls.validators = getattr(cls,"validators",{})
-            cls.validators[func.__name__] = cls.validators.get(func.__name__,[])
-            cls.validators[func.__name__].append((func,msg,kwargs))
-        return register
-#----------------------------------------------#
+#-------------------magic methods---------------------#
     def __new__(cls,*args,**kwargs):#delete and update implictly pass id when called from instance
         inst = super().__new__(cls)
         inst.delete = lambda : cls.delete(id=inst.id)
@@ -307,6 +298,28 @@ class Model:
 
     def __eq__(self,other):#allows checking equality
         return self.id == other.id
+#----------------------------------------------#
+
+class Validation:
+    all_validations = {}
+    def __init__(self,func,msg,kwargs):
+        self.func = func
+        self.msg = msg
+        self.kwargs = kwargs
+        self.model, self.field = func.__qualname__.split('.')
+        model_validations = Validation.all_validations.get(self.model,{})
+        model_validations[self.field] = model_validations.get(self.field,[])
+        model_validations[self.field].append(self)
+        Validation.all_validations[self.model] = model_validations
+
+    def __call__(self,*args,**kwargs):
+        return self.func(*args,**kwargs)
+
+#--------------Decorators-------------------#
+def validator(msg,**kwargs):
+    def inner(func):
+        return Validation(func,msg,kwargs)
+    return inner
 
 def table(table):
     if type(table) is str:
@@ -324,3 +337,4 @@ def login_required(view):
             return redirect('/')
         return view(*args, **kwargs)
     return inner
+#---------------------------------------------#
